@@ -1,0 +1,3 @@
+[submodule "core/class/database"]
+	path = core/class/database
+	url = git@github.com:ershov-ilya/database-class.git
