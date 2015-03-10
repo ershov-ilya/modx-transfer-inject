@@ -13,7 +13,7 @@ header('Content-Type: text/plain; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', false);
+define('WRITE', true);
 
 require_once('../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -60,9 +60,11 @@ foreach($resources as $resource){
     $map_link['aceptor_id']=$newID;
 
     // Вносим строку в карту
-    if(WRITE) {
+    if(WRITE && $newID) {
         $res=$transfer->save($map_link);
-        print "Transfer save:".($res)?'OK':'Fail'."\n";
+        print "Transfer save:";
+        print (!empty($res))?'OK':'Fail';
+        print "\n";
     }
     else{
         print "\n$i) ============================\n";

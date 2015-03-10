@@ -39,7 +39,7 @@ $name_field='templatename';
 //}
 
 $templates=$base->getTable($tablename);
-unset($templates[0]);
+//unset($templates[0]);
 foreach($templates as $template){
     $map_link=array( 'entity'=>'template', 'name'=>$template[$name_field], 'donor_id' => $template['id']);
     
