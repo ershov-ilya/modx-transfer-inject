@@ -37,7 +37,7 @@ $resources=$base->getTable($tablename);
 // Управление циклом
 $i=0;
 $start=$stop=0;
-$stop=20;
+$stop=400;
 
 foreach($resources as $resource){
     if($i<$start) {$i++; continue;}
@@ -50,6 +50,7 @@ foreach($resources as $resource){
     unset($resource['id']);
     $resource['parent'] = $transfer->ptr('resource', $resource['parent']);
     $resource['template'] = $transfer->ptr('template', $resource['template']);
+    if(empty($resource['template'])) $resource['template']=0;
 
     $newID='';
     // Вносим в новый сайт
