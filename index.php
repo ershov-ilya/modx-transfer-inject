@@ -16,4 +16,4 @@ ini_set("display_errors", 1);
 require_once('core/config/core.config.php');
 require_once(CORE_PATH.'/core/class/database/database.class.php');
 
-$sbs = new Database('')
+print Database::test();
