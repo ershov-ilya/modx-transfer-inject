@@ -21,7 +21,7 @@ class RecurseMODX {
     }
 
 
-    public function recurse($id){
+    public function recurseFrom($id){
         $sql="SELECT id FROM modx_site_content WHERE parent='$id'";
         $children=$this->dbc->get($sql);
 
@@ -33,7 +33,7 @@ class RecurseMODX {
         {
             foreach($children as $child)
             {
-                $res = $this->recurse($child['id']);
+                $res = $this->recurseFrom($child['id']);
                 //print $res['id']."\n";
                 $arr[$child['id']] = $res;
             }

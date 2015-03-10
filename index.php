@@ -27,6 +27,9 @@ $base = new Database(API_CONFIG_PATH.'/base.pdo.config.php');
 //print_r($res);
 
 $rbase=new RecurseMODX($base);
-print_r($rbase->recurse(0));
-print_r($rbase->listFrom(0));
+print_r($rbase->recurseFrom(0));
+
+$docList=$rbase->listFrom(0);
+//asort($docList);
+print_r($docList);
 
