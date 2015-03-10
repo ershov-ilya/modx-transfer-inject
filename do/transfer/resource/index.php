@@ -9,7 +9,6 @@
  * Time: 16:08
  */
 
-
 header('Content-Type: text/plain; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
@@ -34,12 +33,15 @@ $name_field='pagetitle';
 
 $resources=$base->getTable($tablename);
 
-//print_r($resources[10]);
-var_dump($transfer->is_exist('resource', 0));
+//print $transfer->ptr('template', 3);
 
-exit(0);
+// Управление циклом
 $i=0;
+$start=$stop=0;
+//$stop=0;
+
 foreach($resources as $resource){
+    if($i<$start) continue;
     $map_link=array( 'entity'=>'resource', 'name'=>$resource[$name_field], 'donor_id' => $resource['id']);
 
     unset($resource['id']);
@@ -54,14 +56,13 @@ foreach($resources as $resource){
 
     // Вносим строку в карту
     if(WRITE) {
-        $res=$sbs->putOne('import_map', $map_link);
-        print "import_map insert:".$res."\n";
+        $res=$transfer->save($map_link);
+        print "transfer Save:".$res."\n";
     }
     else{
         print_r($map_link);
     }
 
-//    break;
     $i++;
-    if($i>50) break;
+    if($i>$stop) break;
 }

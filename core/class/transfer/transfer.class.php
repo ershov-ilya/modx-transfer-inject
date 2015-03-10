@@ -26,7 +26,7 @@ class Transfer {
     public function ptr($entity, $oldID){
         $sql="SELECT * FROM $this->table_name WHERE entity='$entity' AND donor_id='$oldID'";
         $res=$this->dbc->get($sql);
-        return $res['aceptor_id'];
+        return $res[0]["aceptor_id"];
     }
 
     public function is_exist($entity, $oldID){
@@ -43,7 +43,7 @@ class Transfer {
         return false;
     }
 
-    public function log($map_link){
+    public function save($map_link){
         $res=$this->dbc->putOne('import_map', $map_link);
         return $res;
     }
