@@ -22,18 +22,39 @@ class RecurseMODX {
 
 
     public function recurse($id){
-        $sql="SELECT id,pagetitle,parent FROM modx_site_content WHERE parent='$id'";
+        $sql="SELECT id FROM modx_site_content WHERE parent='$id'";
         $children=$this->dbc->get($sql);
-        $arr = array('id' => $id);
-        if(!empty($children))
+
+        $arr = array();
+        if(empty($children)) {
+//            $arr = $this->dbc->getOne('modx_site_content',$id,'pagetitle');
+            $arr = 'last';
+        }else
         {
             foreach($children as $child)
             {
                 $res = $this->recurse($child['id']);
                 //print $res['id']."\n";
-                $arr['children'][$child['id']] = $this->recurse($res['id']);
+                $arr[$child['id']] = $res;
             }
         }
         return $arr;
+    }
+
+    public function listFrom($id){
+        $result = array($id);
+        $sql="SELECT id FROM modx_site_content WHERE parent='$id'";
+        $children=$this->dbc->get($sql);
+
+        if(!empty($children))
+        {
+            foreach($children as $child)
+            {
+                $res = $this->listFrom($child['id']);
+                //print $res['id']."\n";
+                $result = array_merge($result, $res);
+            }
+        }
+        return $result;
     }
 }

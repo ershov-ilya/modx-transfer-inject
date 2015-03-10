@@ -12,7 +12,7 @@
 header('Content-Type: text/plain; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
-define('DEBUG', false);
+define('DEBUG', true);
 
 require_once('core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -28,5 +28,5 @@ $base = new Database(API_CONFIG_PATH.'/base.pdo.config.php');
 
 $rbase=new RecurseMODX($base);
 print_r($rbase->recurse(0));
-//var_dump($rbase->recurse(1));
+print_r($rbase->listFrom(0));
 
