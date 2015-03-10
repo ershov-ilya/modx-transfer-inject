@@ -37,17 +37,18 @@ $resources=$base->getTable($tablename);
 // Управление циклом
 $i=0;
 $start=$stop=0;
-//$stop=0;
+$stop=20;
 
 foreach($resources as $resource){
-    if($i<$start) continue;
+    if($i<$start) {$i++; continue;}
     if($i>$stop) break;
-    if($transfer->is_exist('resource', $resource['id'] )) continue; // Предотвратить дубликаты
-    if($transfer->not('resource', $resource['parent'] )) continue; // Предотвратить запись, если родитель ещё не перенесён
+    if($transfer->is_exist('resource', $resource['id'] ))  {$i++; continue;} // Предотвратить дубликаты
+    if($transfer->not('resource', $resource['parent'] ))  {$i++; continue;} // Предотвратить запись, если родитель ещё не перенесён
 
     $map_link=array( 'entity'=>'resource', 'name'=>$resource[$name_field], 'donor_id' => $resource['id']);
 
     unset($resource['id']);
+    $resource['parent'] = $transfer->ptr('resource', $resource['parent']);
     $resource['template'] = $transfer->ptr('template', $resource['template']);
 
     $newID='';
@@ -64,6 +65,8 @@ foreach($resources as $resource){
         print "Transfer save:".($res)?'OK':'Fail'."\n";
     }
     else{
+        print "\n$i) ============================\n";
+        print_r($resource);
         print_r($map_link);
     }
 
