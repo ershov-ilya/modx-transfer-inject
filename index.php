@@ -12,19 +12,21 @@
 header('Content-Type: text/plain; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
+define('DEBUG', false);
 
 require_once('core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
+require_once(API_CORE_PATH.'/class/recurse-modx/recurse-modx.class.php');
 
-//print Database::test();
 /* @var Database $sbs*/
 $sbs = new Database(API_CONFIG_PATH.'/sbs.pdo.config.php');
 /* @var Database $base*/
 $base = new Database(API_CONFIG_PATH.'/base.pdo.config.php');
 
+//$res=$sbs->getTable('import_map');
+//print_r($res);
 
-require_once(API_CORE_PATH.'/class/recurse-modx/recurse-modx.class.php');
 $rbase=new RecurseMODX($base);
-print_r($rbase->get(9));
+print_r($rbase->recurse(0));
+//var_dump($rbase->recurse(1));
 
-//print_r($base->getOne('modx_site_content', 1));
