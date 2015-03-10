@@ -1,3 +1,4 @@
 .idea
 pdo.config.php
-core/config/
+core/config/*pdo.config.php
+core/config/core.config.php

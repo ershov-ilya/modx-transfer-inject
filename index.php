@@ -13,4 +13,6 @@ header('Content-Type: text/plain; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 
+require_once('core/class/database/');
+
 print "OK";
