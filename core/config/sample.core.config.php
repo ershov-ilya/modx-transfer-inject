@@ -9,4 +9,6 @@
  * Time: 10:45
  */
 
-defined('CORE_PATH') or define('CORE_PATH', '/home/arsenal/domains/sbs.edu.ru/public_html/php-scripts/modx-transfer');
+defined('API_BASE_PATH') or define('API_BASE_PATH', '/home/absolute_path/modx-transfer');
+defined('API_CORE_PATH') or define('API_CORE_PATH', API_BASE_PATH.'/core');
+defined('API_CONFIG_PATH') or define('API_CONFIG_PATH', API_CORE_PATH.'/config');
