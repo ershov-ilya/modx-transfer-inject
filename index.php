@@ -55,16 +55,20 @@ define('DEBUG', false);
                 <div class="row">
                     <div class="col-sm-6">
                         <h1 class="cover-heading">Eng</h1>
-                        <p class="lead">Cover is a one-page template for building simple and beautiful home pages. Download, edit the text, and add your own fullscreen background photo to make it your own.</p>
-                        <p class="lead">
-                            <a href="#" class="btn btn-lg btn-default">Learn more</a>
-                        </p>
+                        <ol>
+                            <li class="lead">First, make sure that you have set up all the configuration files, then run all the items in the order:</li>
+                            <li class="lead">Transfer all MODX Templates <a href="do/transfer/templates/" class="btn btn-default" target="_blank">Do &gt;</a></li>
+                            <li class="lead">Transfer all MODX Resources <a href="do/transfer/resource/" class="btn btn-default" target="_blank">Do &gt;</a>. <small>Note: since resources are stored in a tree structure, and should be added to the tree under the existing elements, perform this action several times to ensure to include in the tree at the target site all the resources.</small></li>
+
+                        </ol>
                     </div>
                     <div class="col-sm-6">
                         <h1 class="cover-heading">Rus</h1>
                         <ol>
-                            <li class="lead">Сначала убедитесь что вы настроили все конфиг-файлы</li>
-                            <li class="lead">Затем переносим все шаблоны <a href="do/transfer/templates/" class="btn btn-default" target="_blank">Сделать &gt;</a></li>
+                            <li class="lead">Сначала убедитесь что вы настроили все конфигурационные файлы, затем выполните все пункты по порядку:</li>
+                            <li class="lead">Перенос всех Шаблонов MODX <a href="do/transfer/templates/" class="btn btn-default" target="_blank">Выполнить &gt;</a></li>
+                            <li class="lead">Перенос всех Ресурсов MODX <a href="do/transfer/resource/" class="btn btn-default" target="_blank">Выполнить &gt;</a>. <small>Примечение: так как ресурсы хранятся в виде древовидной структуры и должны добавляться в дерево под уже существующим элементами, выполните это действие несколько раз, чтобы гарантированно включить в дерево на целевом сайте все ресурсы.</small></li>
+
                         </ol>
                     </div>
                 </div>
