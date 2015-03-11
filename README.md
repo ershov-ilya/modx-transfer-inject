@@ -10,9 +10,9 @@ Allows to inject a MODX subsite into existing mother MODX website.
   2. Fill **donor.config.sample.php** file and rename it to **donor.config.php**
   3. Fill **acceptor.config.sample.php** file and rename it to **acceptor.config.php**
 
-3. Import /dumps/import_map.sql intro DB of acceptor site
+3. Import /dumps/import_map.sql into DB of acceptor site
 
-4. And then refer to /index.html to next steps
+4. And then refer to /index.html for next steps
 
 По-русски
 ======
