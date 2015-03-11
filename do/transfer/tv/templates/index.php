@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../../favicon.ico">
+    <link rel="icon" href="../../../../favicon.ico">
 
     <title>Cover Template for Bootstrap</title>
 
@@ -17,7 +17,7 @@
 
 
     <!-- Custom styles for this template -->
-    <link href="../../../cover.css" rel="stylesheet">
+    <link href="../../../../cover.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -34,8 +34,8 @@
  * GitHub:   https://github.com/ershov-ilya/
  * About me: http://about.me/ershov.ilya (EN)
  * Website:  http://ershov.pw/ (RU)
- * Date: 10.03.2015
- * Time: 18:28
+ * Date: 11.03.2015
+ * Time: 16:50
  */
 
 $output='';
@@ -44,9 +44,9 @@ $status='OK';
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', true);
+define('WRITE', false);
 
-require_once('../../../core/config/core.config.php');
+require_once('../../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
 require_once(API_CORE_PATH.'/class/transfer/transfer.class.php');
 //require_once(API_CORE_PATH.'/class/recurse-modx/recurse-modx.class.php');
@@ -137,7 +137,7 @@ foreach($tmplvars as $tmplvar){
                     <h3 class="masthead-brand">TVs</h3>
                     <nav>
                         <ul class="nav masthead-nav">
-                            <li><a href="../../../">&lt; Back</a></li>
+                            <li><a href="../../../../">&lt; Back</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -156,7 +156,7 @@ foreach($tmplvars as $tmplvar){
 
                         if($status='OK')
                         {
-                            print '<p><a href="values" class="btn btn-primary">Следующий шаг &gt;</a></p>';
+                            print '<p><a href="../../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>';
                         }
                         ?>
                     </div>
