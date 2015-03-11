@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../../../favicon.ico">
 
-    <title>Cover Template for Bootstrap</title>
+    <title>Привязка TV к шаблонам</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -134,7 +134,7 @@ foreach($tmplvars as $tmplvar){
 
             <div class="masthead clearfix">
                 <div class="inner">
-                    <h3 class="masthead-brand">TVs</h3>
+                    <h3 class="masthead-brand">Привязка TV к шаблонам</h3>
                     <nav>
                         <ul class="nav masthead-nav">
                             <li><a href="../../../../">&lt; Back</a></li>

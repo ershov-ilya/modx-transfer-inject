@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../../../favicon.ico">
 
-    <title>Cover Template for Bootstrap</title>
+    <title>Запись значений TV</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -44,7 +44,7 @@ $status='OK';
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', false);
+define('WRITE', true);
 
 require_once('../../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -58,11 +58,11 @@ $transfer = new Transfer($sbs);
 /* @var Database $base*/
 $base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
 
-$entity='tmplvar';
-$tablename='modx_site_tmplvars';
-$name_field='name';
+$entity='tmplvar_contentvalue';
+$tablename='modx_site_tmplvar_contentvalues';
+$name_field='tmplvarid';
 
-$tmplvars=$base->getTable($tablename);
+$tmplvar_contentvalues=$base->getTable($tablename);
 
 //print $transfer->ptr('template', 3);
 
@@ -71,39 +71,29 @@ $i=0;
 $start=$stop=0;
 $stop=5000;
 
-foreach($tmplvars as $tmplvar){
+foreach($tmplvar_contentvalues as $tmplvar_contentvalue){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
-    if($transfer->is_exist($entity, $tmplvar['id'] )) // Предотвратить дубликаты
+    if($transfer->is_exist($entity, $tmplvar_contentvalue['id'] )) // Предотвратить дубликаты
     {
         $i++;
-        $output .=  "Skipped:".$tmplvar['id']."\n";
+        $output .=  "Skipped:".$tmplvar_contentvalue['id']."\n";
         continue;
     }
 
-    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar[$name_field], 'donor_id' => $tmplvar['id']);
-    unset($tmplvar['id']);
-    $newID='';
+    // Привязываем к новым id TV
+    $tmplvar_contentvalue['tmplvarid'] = $transfer->ptr('tmplvar', $tmplvar_contentvalue['tmplvarid']);
 
-    // Проверка на конфликт имён
-    // ВНИМАНИЕ: в случае конфликта имён TV переменных, новая TV переменная добавляться не будет
-    // Все значения будут привязаны к уже существующей TV переменной
-    // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
-    $name_conflict=false;
-    $conflict = $sbs->getOne('modx_site_tmplvars', $tmplvar['name'], 'id,name', 'name');
-    if(!empty($conflict)){
-        $name_conflict=true;
-        $newID=$conflict['id'];
-        if(DEBUG)
-        {
-            $conflict_json = json_encode($conflict);
-            $output .= "\nNAME CONFLICT:$conflict_json";
-        }
-    }
+    // Привязываем к новым id документов
+    $tmplvar_contentvalue['contentid'] = $transfer->ptr('resource', $tmplvar_contentvalue['contentid']);
+
+    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar_contentvalue[$name_field], 'donor_id' => $tmplvar_contentvalue['id']);
+    unset($tmplvar_contentvalue['id']);
+    $newID='';
 
     // Вносим в новый сайт
     if(WRITE && $newID=='') {
-        $newID=$sbs->putOne($tablename, $tmplvar);
+        $newID=$sbs->putOne($tablename, $tmplvar_contentvalue);
         $output .= "$tablename insert:".$newID."\n";
     }
     $map_link['aceptor_id']=$newID;
@@ -116,8 +106,8 @@ foreach($tmplvars as $tmplvar){
         $output .=  "\n";
     }
     else{
-        $output .=  "\n$i) ============================\n";
-        $output .= $tmplvar['name'];
+        $output .=  "\n$i) ============================\n   ";
+        $output .= $tmplvar_contentvalue['tmplvarid'].":".$tmplvar_contentvalue['contentid']." ";
         $output .=  json_encode($map_link);
     }
 
@@ -134,7 +124,7 @@ foreach($tmplvars as $tmplvar){
 
             <div class="masthead clearfix">
                 <div class="inner">
-                    <h3 class="masthead-brand">TVs</h3>
+                    <h3 class="masthead-brand">Запись значений TV</h3>
                     <nav>
                         <ul class="nav masthead-nav">
                             <li><a href="../../../../">&lt; Back</a></li>
@@ -156,7 +146,7 @@ foreach($tmplvars as $tmplvar){
 
                         if($status='OK')
                         {
-                            print '<p><a href="../../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>';
+                            print '<div style="margin-bottom:100px;"><a href="../templates" class="btn btn-primary">Следующий шаг &gt;</a></div>';
                         }
                         ?>
                     </div>
