@@ -56,7 +56,7 @@ $output=$_POST['id'];
                     <h3 class="masthead-brand">TVs</h3>
                     <nav>
                         <ul class="nav masthead-nav">
-                            <li><a href="../../../">Home</a></li>
+                            <li><a href="../../../">&lt; Back</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -66,7 +66,7 @@ $output=$_POST['id'];
                 <div class="row">
                     <div class="col-sm-6">
                         <h1 class="cover-heading">Настройки</h1>
-                        <p>Следующим шагом необходиомо создать в админке сайта акцептора создать новый Источник файлов (Media Source) и прописать пути к картинкам сайта Донора</p>
+                        <p>Следующим шагом необходиомо в админке сайта акцептора создать новый Источник файлов (Media Source) и прописать пути к картинкам сайта Донора</p>
                         <form action="" class="form-inline" method="post">
                             <div class="form-group">
                                 <label for="id">ID нового источника файлов</label>
@@ -76,10 +76,18 @@ $output=$_POST['id'];
                         </form>
                     </div>
                     <div class="col-sm-6">
+                        <?php if(!empty($output))
+                        {
+                            print '
                         <h1 class="cover-heading">Результат</h1>
-                        <pre>
-                            <?=$output?>
-                        </pre>
+                                <pre>'.
+                                $output.
+                                '</pre>
+                            <br>
+                            <p><a href="../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>
+                            ';
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
