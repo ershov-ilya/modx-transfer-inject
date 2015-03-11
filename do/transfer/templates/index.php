@@ -21,11 +21,11 @@ require_once(API_CORE_PATH.'/class/database/database.class.php');
 require_once(API_CORE_PATH.'/class/transfer/transfer.class.php');
 
 /* @var Database $sbs*/
-$sbs = new Database(API_CONFIG_PATH.'/sbs.pdo.config.php');
+$sbs = new Database(API_CONFIG_PATH.'/aceptor.pdo.config.php');
 /* @var Transfer $import */
 $transfer = new Transfer($sbs);
 /* @var Database $base*/
-$base = new Database(API_CONFIG_PATH.'/base.pdo.config.php');
+$base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
 
 $tablename='modx_site_templates';
 $name_field='templatename';
