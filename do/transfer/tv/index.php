@@ -1,84 +1,3 @@
-<?php
-/**
- * Created by PhpStorm.
- * Author:   ershov-ilya
- * GitHub:   https://github.com/ershov-ilya/
- * About me: http://about.me/ershov.ilya (EN)
- * Website:  http://ershov.pw/ (RU)
- * Date: 10.03.2015
- * Time: 18:28
- */
-
-$output=$_POST['id'];
-
-error_reporting(E_ERROR | E_WARNING);
-ini_set("display_errors", 1);
-define('DEBUG', true);
-define('WRITE', false);
-
-require_once('../../../core/config/core.config.php');
-require_once(API_CORE_PATH.'/class/database/database.class.php');
-require_once(API_CORE_PATH.'/class/transfer/transfer.class.php');
-//require_once(API_CORE_PATH.'/class/recurse-modx/recurse-modx.class.php');
-
-/* @var Database $sbs*/
-$sbs = new Database(API_CONFIG_PATH.'/aceptor.pdo.config.php');
-/* @var Transfer $import */
-$transfer = new Transfer($sbs);
-/* @var Database $base*/
-$base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
-
-$tablename='modx_site_content';
-$name_field='pagetitle';
-
-$resources=$base->getTable($tablename);
-
-//print $transfer->ptr('template', 3);
-
-// Управление циклом
-$i=0;
-$start=$stop=0;
-$stop=400;
-
-foreach($resources as $resource){
-    if($i<$start) {$i++; continue;}
-    if($i>$stop) break;
-    if($transfer->is_exist('resource', $resource['id'] ))  {$i++; continue;} // Предотвратить дубликаты
-    if($transfer->not('resource', $resource['parent'] ))  {$i++; continue;} // Предотвратить запись, если родитель ещё не перенесён
-
-    $map_link=array( 'entity'=>'resource', 'name'=>$resource[$name_field], 'donor_id' => $resource['id']);
-
-    unset($resource['id']);
-    $resource['parent'] = $transfer->ptr('resource', $resource['parent']);
-    $resource['template'] = $transfer->ptr('template', $resource['template']);
-    if(empty($resource['template'])) $resource['template']=0;
-
-    $newID='';
-    // Вносим в новый сайт
-    if(WRITE) {
-        $newID=$sbs->putOne($tablename, $resource);
-        print "$tablename insert:".$newID."\n";
-    }
-    $map_link['aceptor_id']=$newID;
-
-    // Вносим строку в карту
-    if(WRITE && $newID) {
-        $res=$transfer->save($map_link);
-        print "Transfer save:";
-        print (!empty($res))?'OK':'Fail';
-        print "\n";
-    }
-    else{
-        print "\n$i) ============================\n";
-        print_r($resource);
-        print_r($map_link);
-    }
-
-    $i++;
-}
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -108,6 +27,106 @@ foreach($resources as $resource){
 </head>
 
 <body>
+<?php
+/**
+ * Created by PhpStorm.
+ * Author:   ershov-ilya
+ * GitHub:   https://github.com/ershov-ilya/
+ * About me: http://about.me/ershov.ilya (EN)
+ * Website:  http://ershov.pw/ (RU)
+ * Date: 10.03.2015
+ * Time: 18:28
+ */
+
+$output='';
+$status='OK';
+
+error_reporting(E_ERROR | E_WARNING);
+ini_set("display_errors", 1);
+define('DEBUG', true);
+define('WRITE', false);
+
+require_once('../../../core/config/core.config.php');
+require_once(API_CORE_PATH.'/class/database/database.class.php');
+require_once(API_CORE_PATH.'/class/transfer/transfer.class.php');
+//require_once(API_CORE_PATH.'/class/recurse-modx/recurse-modx.class.php');
+
+/* @var Database $sbs*/
+$sbs = new Database(API_CONFIG_PATH.'/aceptor.pdo.config.php');
+/* @var Transfer $import */
+$transfer = new Transfer($sbs);
+/* @var Database $base*/
+$base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
+
+$entity='tmplvar';
+$tablename='modx_site_tmplvars';
+$name_field='name';
+
+$tmplvars=$base->getTable($tablename);
+
+//print $transfer->ptr('template', 3);
+
+// Управление циклом
+$i=0;
+$start=$stop=0;
+$stop=5000;
+
+foreach($tmplvars as $tmplvar){
+    if($i<$start) {$i++; continue;}
+    if($i>$stop) break;
+    if($transfer->is_exist($entity, $tmplvar['id'] )) // Предотвратить дубликаты
+    {
+        $i++;
+        $output .=  "Skipped:".$tmplvar['id']."\n";
+        continue;
+    }
+
+    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar[$name_field], 'donor_id' => $tmplvar['id']);
+    unset($tmplvar['id']);
+    $newID='';
+
+    // Проверка на конфликт имён
+    // ВНИМАНИЕ: в случае конфликта имён TV переменных, новая TV переменная добавляться не будет
+    // Все значения будут привязаны к уже существующей TV переменной
+    // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
+    $name_conflict=false;
+    $conflict = $sbs->getOne('modx_site_tmplvars', $tmplvar['name'], 'id,name', 'name');
+    if(!empty($conflict)){
+        $name_conflict=true;
+        $newID=$conflict['id'];
+        if(DEBUG)
+        {
+            $conflict_json = json_encode($conflict);
+            $output .= "\nNAME CONFLICT:$conflict_json";
+        }
+    }
+
+    // Вносим в новый сайт
+    if(WRITE && $newID=='') {
+        $newID=$sbs->putOne($tablename, $tmplvar);
+        $output .= "$tablename insert:".$newID."\n";
+    }
+    $map_link['aceptor_id']=$newID;
+
+    // Вносим строку в карту
+    if(WRITE && $newID) {
+        $res=$transfer->save($map_link);
+        $output .=  "Transfer save:";
+        $output .=  (!empty($res))?'OK':'Fail';
+        $output .=  "\n";
+    }
+    else{
+        $output .=  "\n$i) ============================\n";
+//        $output .=  implode("|",$tmplvar);
+        $output .= $tmplvar['name'];
+        $output .=  json_encode($map_link);
+//        print_r($map_link);
+    }
+
+    $i++;
+}
+
+?>
 
 <div class="site-wrapper">
 
@@ -140,16 +159,15 @@ foreach($resources as $resource){
                         </form>
                     </div>
                     <div class="col-sm-6">
-                        <?php if(!empty($output))
+                        <?php
+                        if(!empty($output))
                         {
-                            print '
-                        <h1 class="cover-heading">Результат</h1>
-                                <pre>'.
-                                $output.
-                                '</pre>
-                            <br>
-                            <p><a href="../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>
-                            ';
+                            print '<h1 class="cover-heading">Результат</h1><pre>'.$output.'</pre><br>';
+                        }
+
+                        if($status='OK')
+                        {
+                            print '<p><a href="../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>';
                         }
                         ?>
                     </div>

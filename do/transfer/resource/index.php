@@ -37,7 +37,7 @@ $resources=$base->getTable($tablename);
 // Управление циклом
 $i=0;
 $start=$stop=0;
-$stop=400;
+$stop=5000;
 
 foreach($resources as $resource){
     if($i<$start) {$i++; continue;}
