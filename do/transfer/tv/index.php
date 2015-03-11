@@ -109,18 +109,16 @@ foreach($tmplvars as $tmplvar){
     $map_link['aceptor_id']=$newID;
 
     // Вносим строку в карту
-    if(WRITE && $newID) {
+    if(WRITE && $newID!='') {
         $res=$transfer->save($map_link);
-        $output .=  "Transfer save:";
+        $output .=  "Transfer save ".$map_link['name']."(".$map_link['donor_id']."): ";
         $output .=  (!empty($res))?'OK':'Fail';
         $output .=  "\n";
     }
     else{
         $output .=  "\n$i) ============================\n";
-//        $output .=  implode("|",$tmplvar);
         $output .= $tmplvar['name'];
         $output .=  json_encode($map_link);
-//        print_r($map_link);
     }
 
     $i++;
