@@ -21,7 +21,7 @@ require_once(API_CORE_PATH.'/class/database/database.class.php');
 require_once(API_CORE_PATH.'/class/transfer/transfer.class.php');
 
 /* @var Database $sbs*/
-$sbs = new Database(API_CONFIG_PATH.'/aceptor.pdo.config.php');
+$sbs = new Database(API_CONFIG_PATH.'/acceptor.pdo.config.php');
 /* @var Transfer $import */
 $transfer = new Transfer($sbs);
 /* @var Database $base*/
