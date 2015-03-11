@@ -17,10 +17,13 @@ define('WRITE', false);
 
 require_once('../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
-require_once(API_CORE_PATH.'/class/recurse-modx/recurse-modx.class.php');
+//require_once(API_CORE_PATH.'/class/recurse-modx/recurse-modx.class.php');
+require_once(API_CORE_PATH.'/class/transfer/transfer.class.php');
 
 /* @var Database $sbs*/
 $sbs = new Database(API_CONFIG_PATH.'/sbs.pdo.config.php');
+/* @var Transfer $import */
+$transfer = new Transfer($sbs);
 /* @var Database $base*/
 $base = new Database(API_CONFIG_PATH.'/base.pdo.config.php');
 
@@ -41,6 +44,8 @@ $name_field='templatename';
 $templates=$base->getTable($tablename);
 //unset($templates[0]);
 foreach($templates as $template){
+    if($transfer->is_exist('template', $template['id'] ))  {$i++; continue;} // Предотвратить дубликаты
+
     $map_link=array( 'entity'=>'template', 'name'=>$template[$name_field], 'donor_id' => $template['id']);
     
     unset($template['id']);

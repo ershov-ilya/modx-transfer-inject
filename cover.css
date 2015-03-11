@@ -15,7 +15,7 @@ a:hover {
 .btn-default:focus {
   color: #333;
   text-shadow: none; /* Prevent inheritence from `body` */
-  background-color: #fff;
+  /*background-color: #fff;*/
   border: 1px solid #fff;
 }
 
@@ -31,7 +31,7 @@ body {
 }
 body {
   color: #fff;
-  text-align: center;
+  text-align: left;
   text-shadow: 0 1px 3px rgba(0,0,0,.5);
 }
 
@@ -82,6 +82,7 @@ body {
   color: rgba(255,255,255,.75);
   border-bottom: 2px solid transparent;
 }
+
 .masthead-nav > li > a:hover,
 .masthead-nav > li > a:focus {
   background-color: transparent;
@@ -158,6 +159,6 @@ body {
   .masthead,
   .mastfoot,
   .cover-container {
-    width: 90%;
+    width: 80%;
   }
 }
