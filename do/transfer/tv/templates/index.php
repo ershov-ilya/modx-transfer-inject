@@ -44,7 +44,7 @@ $status='OK';
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', false);
+define('WRITE', true);
 
 require_once('../../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -64,7 +64,6 @@ $tablename='modx_site_tmplvar_templates';
 
 $tmplvar_templates=$base->getTable($tablename);
 
-//print $transfer->ptr('template', 3);
 
 // Управление циклом
 $i=0;
@@ -75,56 +74,50 @@ foreach($tmplvar_templates as $tmplvar_template){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
 
-    print_r($tmplvar_template);
+//    print_r($tmplvar_template);
+    $map_link_id=$tmplvar_template['tmplvarid']*1000+$tmplvar_template['templateid'];
+    $map_link_name="tv:".$tmplvar_template['tmplvarid'].',tpl:'.$tmplvar_template['templateid'];
 
-    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar[$name_field], 'donor_id' => $tmplvar['id']);
-    // Привязываем к новым id TV
-//    $tmplvar_contentvalue['tmplvarid'] = $transfer->ptr('tmplvar', $tmplvar_contentvalue['tmplvarid']);
+    $map_link=array( 'entity'=>$entity, 'name'=>$map_link_name, 'donor_id' => $map_link_id);
+//    print_r($map_link);
 
-    exit(0);
-
-    if($transfer->is_exist($entity, $tmplvar['id'] )) // Предотвратить дубликаты
+    if($transfer->is_exist($entity, $map_link_id)) // Предотвратить дубликаты
     {
         $i++;
-        $output .=  "Skipped:".$tmplvar['id']."\n";
+        $output .=  "Skipped:".$map_link_name."\n";
         continue;
     }
 
-    $newID='';
+    // Привязываем к новым id TV
+    $tmplvar_template['tmplvarid'] = $transfer->ptr('tmplvar', $tmplvar_template['tmplvarid']);
+    $tmplvar_template['templateid'] = $transfer->ptr('template', $tmplvar_template['templateid']);
+//    print_r($tmplvar_template);
 
-    // Проверка на конфликт имён
-    // ВНИМАНИЕ: в случае конфликта имён TV переменных, новая TV переменная добавляться не будет
-    // Все значения будут привязаны к уже существующей TV переменной
-    // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
-    $name_conflict=false;
-    $conflict = $sbs->getOne('modx_site_tmplvars', $tmplvar['name'], 'id,name', 'name');
-    if(!empty($conflict)){
-        $name_conflict=true;
-        $newID=$conflict['id'];
-        if(DEBUG)
-        {
-            $conflict_json = json_encode($conflict);
-            $output .= "\nNAME CONFLICT:$conflict_json";
-        }
-    }
+    $newID='';
 
     // Вносим в новый сайт
     if(WRITE && $newID=='') {
-        $newID=$sbs->putOne($tablename, $tmplvar);
+        $newID=$sbs->putOne($tablename, $tmplvar_template);
         $output .= "$tablename insert:".$newID."\n";
     }
     $map_link['aceptor_id']=$newID;
 
     // Вносим строку в карту
     if(WRITE && $newID!='') {
+        $map_link['aceptor_id'] = $tmplvar_template['tmplvarid']*1000+$tmplvar_template['templateid'];
         $res=$transfer->save($map_link);
         $output .=  "Transfer save ".$map_link['name']."(".$map_link['donor_id']."): ";
-        $output .=  (!empty($res))?'OK':'Fail';
+        if(!empty($res)){
+            $output .= 'OK';
+        }
+        else{
+            $output .= 'Fail';
+        }
         $output .=  "\n";
     }
     else{
         $output .=  "\n$i) ============================\n";
-        $output .= $tmplvar['name'];
+        $output .= $tmplvar_template['name'];
         $output .=  json_encode($map_link);
     }
 
@@ -163,7 +156,7 @@ foreach($tmplvar_templates as $tmplvar_template){
 
                         if($status='OK')
                         {
-                            print '<p><a href="../../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>';
+                            print '<p><a href="../../../../" class="btn btn-primary margin-bottom">&lt; Вернуться назад</a></p>';
                         }
                         ?>
                     </div>
