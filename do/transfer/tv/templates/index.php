@@ -58,11 +58,11 @@ $transfer = new Transfer($sbs);
 /* @var Database $base*/
 $base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
 
-$entity='tmplvar';
-$tablename='modx_site_tmplvars';
-$name_field='name';
+$entity='tmplvar_template';
+$tablename='modx_site_tmplvar_templates';
+//$name_field='name';
 
-$tmplvars=$base->getTable($tablename);
+$tmplvar_templates=$base->getTable($tablename);
 
 //print $transfer->ptr('template', 3);
 
@@ -71,9 +71,18 @@ $i=0;
 $start=$stop=0;
 $stop=5000;
 
-foreach($tmplvars as $tmplvar){
+foreach($tmplvar_templates as $tmplvar_template){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
+
+    print_r($tmplvar_template);
+
+    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar[$name_field], 'donor_id' => $tmplvar['id']);
+    // Привязываем к новым id TV
+//    $tmplvar_contentvalue['tmplvarid'] = $transfer->ptr('tmplvar', $tmplvar_contentvalue['tmplvarid']);
+
+    exit(0);
+
     if($transfer->is_exist($entity, $tmplvar['id'] )) // Предотвратить дубликаты
     {
         $i++;
@@ -81,8 +90,6 @@ foreach($tmplvars as $tmplvar){
         continue;
     }
 
-    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar[$name_field], 'donor_id' => $tmplvar['id']);
-    unset($tmplvar['id']);
     $newID='';
 
     // Проверка на конфликт имён

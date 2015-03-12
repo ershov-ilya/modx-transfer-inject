@@ -146,7 +146,7 @@ foreach($tmplvar_contentvalues as $tmplvar_contentvalue){
 
                         if($status='OK')
                         {
-                            print '<div style="margin-bottom:100px;"><a href="../templates" class="btn btn-primary">Следующий шаг &gt;</a></div>';
+                            print '<div><a href="../templates" class="btn btn-primary margin-bottom">Следующий шаг &gt;</a></div>';
                         }
                         ?>
                     </div>
