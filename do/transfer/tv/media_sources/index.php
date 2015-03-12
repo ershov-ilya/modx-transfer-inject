@@ -44,7 +44,7 @@ $status='OK';
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', false);
+define('WRITE', true);
 
 require_once('../../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -58,11 +58,13 @@ $transfer = new Transfer($sbs);
 /* @var Database $base*/
 $base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
 
-$entity='tmplvar_template';
-$tablename='modx_site_tmplvar_templates';
+$entity='media_source_element';
+$tablename='modx_media_sources_elements';
 //$name_field='name';
+$source_id=0;
+if(isset($_POST['id'])) $source_id=filter_var($_POST['id'],FILTER_SANITIZE_NUMBER_INT);
 
-$tmplvar_templates=$base->getTable($tablename);
+$media_sources_elements=$base->getTable($tablename);
 
 
 // Управление циклом
@@ -70,13 +72,14 @@ $i=0;
 $start=$stop=0;
 $stop=5000;
 
-foreach($tmplvar_templates as $tmplvar_template){
+if(!empty($source_id))
+foreach($media_sources_elements as $media_source_element){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
 
 //    print_r($tmplvar_template);
-    $map_link_id=$tmplvar_template['tmplvarid']*1000+$tmplvar_template['templateid'];
-    $map_link_name="tv:".$tmplvar_template['tmplvarid'].',tpl:'.$tmplvar_template['templateid'];
+    $map_link_id=$media_source_element['source']*1000+$media_source_element['object'];
+    $map_link_name=$media_source_element['object_class']." id:".$media_source_element['object'];
 
     $map_link=array( 'entity'=>$entity, 'name'=>$map_link_name, 'donor_id' => $map_link_id);
 //    print_r($map_link);
@@ -89,22 +92,21 @@ foreach($tmplvar_templates as $tmplvar_template){
     }
 
     // Привязываем к новым id TV
-    $tmplvar_template['tmplvarid'] = $transfer->ptr('tmplvar', $tmplvar_template['tmplvarid']);
-    $tmplvar_template['templateid'] = $transfer->ptr('template', $tmplvar_template['templateid']);
-//    print_r($tmplvar_template);
-
+    $media_source_element['object'] = $transfer->ptr('tmplvar', $media_source_element['object']);
+    $media_source_element['source'] = $source_id;
+    print_r($media_source_element);
     $newID='';
 
     // Вносим в новый сайт
     if(WRITE && $newID=='') {
-        $newID=$sbs->putOne($tablename, $tmplvar_template);
+        $newID=$sbs->putOne($tablename, $media_source_element);
         $output .= "$tablename insert:".$newID."\n";
     }
     $map_link['aceptor_id']=$newID;
 
     // Вносим строку в карту
     if(WRITE && $newID!='') {
-        $map_link['aceptor_id'] = $tmplvar_template['tmplvarid']*1000+$tmplvar_template['templateid'];
+        $map_link['aceptor_id'] = $media_source_element['source']*1000+$media_source_element['object'];
         $res=$transfer->save($map_link);
         $output .=  "Transfer save ".$map_link['name']."(".$map_link['donor_id']."): ";
         if(!empty($res)){
@@ -117,11 +119,12 @@ foreach($tmplvar_templates as $tmplvar_template){
     }
     else{
         $output .=  "\n$i) ============================\n";
-        $output .= $tmplvar_template['name'];
+        $output .= $map_link_name;
         $output .=  json_encode($map_link);
     }
 
     $i++;
+//    break;
 }
 
 ?>
@@ -130,7 +133,7 @@ foreach($tmplvar_templates as $tmplvar_template){
 
     <div class="site-wrapper-inner">
 
-        <div class="cover-container">
+        <div class="cover-container margin-top">
 
             <div class="masthead clearfix">
                 <div class="inner">
@@ -146,6 +149,15 @@ foreach($tmplvar_templates as $tmplvar_template){
             <div class="inner cover">
                 <div class="row">
                     <div class="col-sm-6">
+                        <h1 class="cover-heading">Настройки</h1>
+                        <p>Следующим шагом необходиомо в админке сайта акцептора создать новый Источник файлов (Media Source) и прописать пути к картинкам сайта Донора</p>
+                        <form action="" class="form-inline" method="post">
+                            <div class="form-group">
+                                <label for="id">ID нового источника файлов</label>
+                                <input type="text" name="id" placeholder="ID" class="form-control">
+                                <input type="submit" value="Выполнитиь" class="form-control">
+                            </div>
+                        </form>
                     </div>
                     <div class="col-sm-6">
                         <?php
@@ -156,7 +168,7 @@ foreach($tmplvar_templates as $tmplvar_template){
 
                         if($status='OK')
                         {
-                            print '<p><a href="../../../../" class="btn btn-primary margin-bottom">&lt; Вернуться назад</a></p>';
+                            print '<p><a href="../../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>';
                         }
                         ?>
                     </div>

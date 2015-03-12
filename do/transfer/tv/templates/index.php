@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../../../favicon.ico">
 
-    <title>Привязка TV к шаблонам</title>
+    <title>Привязка TV к Шаблонам</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -117,7 +117,7 @@ foreach($tmplvar_templates as $tmplvar_template){
     }
     else{
         $output .=  "\n$i) ============================\n";
-        $output .= $tmplvar_template['name'];
+        $output .= $map_link_name;
         $output .=  json_encode($map_link);
     }
 
