@@ -156,7 +156,7 @@ foreach($tmplvar_templates as $tmplvar_template){
 
                         if($status='OK')
                         {
-                            print '<p><a href="../../../../" class="btn btn-primary margin-bottom">&lt; Вернуться назад</a></p>';
+                            print '<div><a href="../media_sources" class="btn btn-primary margin-bottom">Следующий шаг &gt;</a></div>';
                         }
                         ?>
                     </div>

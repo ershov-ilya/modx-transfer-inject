@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../../../favicon.ico">
 
-    <title>Cover Template for Bootstrap</title>
+    <title>Привязка TV к Источникам файлов</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -58,66 +58,66 @@ $transfer = new Transfer($sbs);
 /* @var Database $base*/
 $base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
 
-$entity='tmplvar';
-$tablename='modx_site_tmplvars';
-$name_field='name';
+$entity='tmplvar_template';
+$tablename='modx_site_tmplvar_templates';
+//$name_field='name';
 
-$tmplvars=$base->getTable($tablename);
+$tmplvar_templates=$base->getTable($tablename);
 
-//print $transfer->ptr('template', 3);
 
 // Управление циклом
 $i=0;
 $start=$stop=0;
 $stop=5000;
 
-foreach($tmplvars as $tmplvar){
+foreach($tmplvar_templates as $tmplvar_template){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
-    if($transfer->is_exist($entity, $tmplvar['id'] )) // Предотвратить дубликаты
+
+//    print_r($tmplvar_template);
+    $map_link_id=$tmplvar_template['tmplvarid']*1000+$tmplvar_template['templateid'];
+    $map_link_name="tv:".$tmplvar_template['tmplvarid'].',tpl:'.$tmplvar_template['templateid'];
+
+    $map_link=array( 'entity'=>$entity, 'name'=>$map_link_name, 'donor_id' => $map_link_id);
+//    print_r($map_link);
+
+    if($transfer->is_exist($entity, $map_link_id)) // Предотвратить дубликаты
     {
         $i++;
-        $output .=  "Skipped:".$tmplvar['id']."\n";
+        $output .=  "Skipped:".$map_link_name."\n";
         continue;
     }
 
-    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar[$name_field], 'donor_id' => $tmplvar['id']);
-    unset($tmplvar['id']);
-    $newID='';
+    // Привязываем к новым id TV
+    $tmplvar_template['tmplvarid'] = $transfer->ptr('tmplvar', $tmplvar_template['tmplvarid']);
+    $tmplvar_template['templateid'] = $transfer->ptr('template', $tmplvar_template['templateid']);
+//    print_r($tmplvar_template);
 
-    // Проверка на конфликт имён
-    // ВНИМАНИЕ: в случае конфликта имён TV переменных, новая TV переменная добавляться не будет
-    // Все значения будут привязаны к уже существующей TV переменной
-    // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
-    $name_conflict=false;
-    $conflict = $sbs->getOne('modx_site_tmplvars', $tmplvar['name'], 'id,name', 'name');
-    if(!empty($conflict)){
-        $name_conflict=true;
-        $newID=$conflict['id'];
-        if(DEBUG)
-        {
-            $conflict_json = json_encode($conflict);
-            $output .= "\nNAME CONFLICT:$conflict_json";
-        }
-    }
+    $newID='';
 
     // Вносим в новый сайт
     if(WRITE && $newID=='') {
-        $newID=$sbs->putOne($tablename, $tmplvar);
+        $newID=$sbs->putOne($tablename, $tmplvar_template);
         $output .= "$tablename insert:".$newID."\n";
     }
     $map_link['aceptor_id']=$newID;
 
     // Вносим строку в карту
     if(WRITE && $newID!='') {
+        $map_link['aceptor_id'] = $tmplvar_template['tmplvarid']*1000+$tmplvar_template['templateid'];
         $res=$transfer->save($map_link);
         $output .=  "Transfer save ".$map_link['name']."(".$map_link['donor_id']."): ";
-        $output .=  (!empty($res))?'OK':'Fail';
+        if(!empty($res)){
+            $output .= 'OK';
+        }
+        else{
+            $output .= 'Fail';
+        }
         $output .=  "\n";
     }
     else{
         $output .=  "\n$i) ============================\n";
-        $output .= $tmplvar['name'];
+        $output .= $tmplvar_template['name'];
         $output .=  json_encode($map_link);
     }
 
@@ -134,7 +134,7 @@ foreach($tmplvars as $tmplvar){
 
             <div class="masthead clearfix">
                 <div class="inner">
-                    <h3 class="masthead-brand">TVs</h3>
+                    <h3 class="masthead-brand">Привязка TV к Источникам файлов</h3>
                     <nav>
                         <ul class="nav masthead-nav">
                             <li><a href="../../../../">&lt; Back</a></li>
@@ -146,15 +146,6 @@ foreach($tmplvars as $tmplvar){
             <div class="inner cover">
                 <div class="row">
                     <div class="col-sm-6">
-                        <h1 class="cover-heading">Настройки</h1>
-                        <p>Следующим шагом необходиомо в админке сайта акцептора создать новый Источник файлов (Media Source) и прописать пути к картинкам сайта Донора</p>
-                        <form action="" class="form-inline" method="post">
-                            <div class="form-group">
-                                <label for="id">ID нового источника файлов</label>
-                                <input type="text" name="id" placeholder="ID" class="form-control">
-                                <input type="submit" value="Выполнитиь" class="form-control">
-                            </div>
-                        </form>
                     </div>
                     <div class="col-sm-6">
                         <?php
@@ -165,7 +156,7 @@ foreach($tmplvars as $tmplvar){
 
                         if($status='OK')
                         {
-                            print '<p><a href="../../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>';
+                            print '<p><a href="../../../../" class="btn btn-primary margin-bottom">&lt; Вернуться назад</a></p>';
                         }
                         ?>
                     </div>
