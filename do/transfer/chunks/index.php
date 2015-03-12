@@ -35,16 +35,14 @@
  * About me: http://about.me/ershov.ilya (EN)
  * Website:  http://ershov.pw/ (RU)
  * Date: 10.03.2015
- * Time: 18:28
+ * Time: 16:08
  */
 
-$output='';
-$status='OK';
-
+header('Content-Type: text/plain; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', true);
+define('WRITE', false);
 
 require_once('../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -58,11 +56,10 @@ $transfer = new Transfer($sbs);
 /* @var Database $base*/
 $base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
 
-$entity='tmplvar';
-$tablename='modx_site_tmplvars';
-$name_field='name';
+$tablename='modx_site_content';
+$name_field='pagetitle';
 
-$tmplvars=$base->getTable($tablename);
+$resources=$base->getTable($tablename);
 
 //print $transfer->ptr('template', 3);
 
@@ -71,58 +68,43 @@ $i=0;
 $start=$stop=0;
 $stop=5000;
 
-foreach($tmplvars as $tmplvar){
+foreach($resources as $resource){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
-    if($transfer->is_exist($entity, $tmplvar['id'] )) // Предотвратить дубликаты
-    {
-        $i++;
-        $output .=  "Skipped:".$tmplvar['id']."\n";
-        continue;
-    }
+    if($transfer->is_exist('resource', $resource['id'] ))  {$i++; continue;} // Предотвратить дубликаты
+    if($transfer->not('resource', $resource['parent'] ))  {$i++; continue;} // Предотвратить запись, если родитель ещё не перенесён
 
-    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar[$name_field], 'donor_id' => $tmplvar['id']);
-    unset($tmplvar['id']);
+    $map_link=array( 'entity'=>'resource', 'name'=>$resource[$name_field], 'donor_id' => $resource['id']);
+
+    unset($resource['id']);
+    $resource['parent'] = $transfer->ptr('resource', $resource['parent']);
+    $resource['template'] = $transfer->ptr('template', $resource['template']);
+    if(empty($resource['template'])) $resource['template']=0;
+
     $newID='';
-
-    // Проверка на конфликт имён
-    // ВНИМАНИЕ: в случае конфликта имён TV переменных, новая TV переменная добавляться не будет
-    // Все значения будут привязаны к уже существующей TV переменной
-    // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
-    $name_conflict=false;
-    $conflict = $sbs->getOne('modx_site_tmplvars', $tmplvar['name'], 'id,name', 'name');
-    if(!empty($conflict)){
-        $name_conflict=true;
-        $newID=$conflict['id'];
-        if(DEBUG)
-        {
-            $conflict_json = json_encode($conflict);
-            $output .= "\nNAME CONFLICT:$conflict_json";
-        }
-    }
-
     // Вносим в новый сайт
-    if(WRITE && $newID=='') {
-        $newID=$sbs->putOne($tablename, $tmplvar);
-        $output .= "$tablename insert:".$newID."\n";
+    if(WRITE) {
+        $newID=$sbs->putOne($tablename, $resource);
+        print "$tablename insert:".$newID."\n";
     }
     $map_link['aceptor_id']=$newID;
 
     // Вносим строку в карту
-    if(WRITE && $newID!='') {
+    if(WRITE && $newID) {
         $res=$transfer->save($map_link);
-        $output .=  "Transfer save ".$map_link['name']."(".$map_link['donor_id']."): ";
-        $output .=  (!empty($res))?'OK':'Fail';
-        $output .=  "\n";
+        print "Transfer save:";
+        print (!empty($res))?'OK':'Fail';
+        print "\n";
     }
     else{
-        $output .=  "\n$i) ============================\n";
-        $output .= $tmplvar['name'];
-        $output .=  json_encode($map_link);
+        print "\n$i) ============================\n";
+        print_r($resource);
+        print_r($map_link);
     }
 
     $i++;
 }
+
 
 ?>
 
