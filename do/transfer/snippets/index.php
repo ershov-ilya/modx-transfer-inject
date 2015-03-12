@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../../../favicon.ico">
+    <link rel="icon" href="../../../favicon.ico">
 
-    <title>Привязка TV к Источникам файлов</title>
+    <title>Cover Template for Bootstrap</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -17,7 +17,7 @@
 
 
     <!-- Custom styles for this template -->
-    <link href="../../../../cover.css" rel="stylesheet">
+    <link href="../../../cover.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -34,8 +34,8 @@
  * GitHub:   https://github.com/ershov-ilya/
  * About me: http://about.me/ershov.ilya (EN)
  * Website:  http://ershov.pw/ (RU)
- * Date: 11.03.2015
- * Time: 16:50
+ * Date: 10.03.2015
+ * Time: 18:28
  */
 
 $output='';
@@ -46,7 +46,7 @@ ini_set("display_errors", 1);
 define('DEBUG', true);
 define('WRITE', false);
 
-require_once('../../../../core/config/core.config.php');
+require_once('../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
 require_once(API_CORE_PATH.'/class/transfer/transfer.class.php');
 //require_once(API_CORE_PATH.'/class/recurse-modx/recurse-modx.class.php');
@@ -58,73 +58,70 @@ $transfer = new Transfer($sbs);
 /* @var Database $base*/
 $base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
 
-$entity='media_source_element';
-$tablename='modx_media_sources_elements';
-//$name_field='name';
-$source_id=0;
-if(isset($_POST['id'])) $source_id=filter_var($_POST['id'],FILTER_SANITIZE_NUMBER_INT);
+$entity='tmplvar';
+$tablename='modx_site_tmplvars';
+$name_field='name';
 
-$media_sources_elements=$base->getTable($tablename);
+$tmplvars=$base->getTable($tablename);
 
+//print $transfer->ptr('template', 3);
 
 // Управление циклом
 $i=0;
 $start=$stop=0;
 $stop=5000;
 
-if(!empty($source_id))
-foreach($media_sources_elements as $media_source_element){
+foreach($tmplvars as $tmplvar){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
-
-//    print_r($tmplvar_template);
-    $map_link_id=$media_source_element['source']*1000+$media_source_element['object'];
-    $map_link_name=$media_source_element['object_class']." id:".$media_source_element['object'];
-
-    $map_link=array( 'entity'=>$entity, 'name'=>$map_link_name, 'donor_id' => $map_link_id);
-//    print_r($map_link);
-
-    if($transfer->is_exist($entity, $map_link_id)) // Предотвратить дубликаты
+    if($transfer->is_exist($entity, $tmplvar['id'] )) // Предотвратить дубликаты
     {
         $i++;
-        $output .=  "Skipped:".$map_link_name."\n";
+        $output .=  "Skipped:".$tmplvar['id']."\n";
         continue;
     }
 
-    // Привязываем к новым id TV
-    $media_source_element['object'] = $transfer->ptr('tmplvar', $media_source_element['object']);
-    $media_source_element['source'] = $source_id;
-    print_r($media_source_element);
+    $map_link=array( 'entity'=>$entity, 'name'=>$tmplvar[$name_field], 'donor_id' => $tmplvar['id']);
+    unset($tmplvar['id']);
     $newID='';
+
+    // Проверка на конфликт имён
+    // ВНИМАНИЕ: в случае конфликта имён TV переменных, новая TV переменная добавляться не будет
+    // Все значения будут привязаны к уже существующей TV переменной
+    // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
+    $name_conflict=false;
+    $conflict = $sbs->getOne('modx_site_tmplvars', $tmplvar['name'], 'id,name', 'name');
+    if(!empty($conflict)){
+        $name_conflict=true;
+        $newID=$conflict['id'];
+        if(DEBUG)
+        {
+            $conflict_json = json_encode($conflict);
+            $output .= "\nNAME CONFLICT:$conflict_json";
+        }
+    }
 
     // Вносим в новый сайт
     if(WRITE && $newID=='') {
-        $newID=$sbs->putOne($tablename, $media_source_element);
+        $newID=$sbs->putOne($tablename, $tmplvar);
         $output .= "$tablename insert:".$newID."\n";
     }
     $map_link['aceptor_id']=$newID;
 
     // Вносим строку в карту
     if(WRITE && $newID!='') {
-        $map_link['aceptor_id'] = $media_source_element['source']*1000+$media_source_element['object'];
         $res=$transfer->save($map_link);
         $output .=  "Transfer save ".$map_link['name']."(".$map_link['donor_id']."): ";
-        if(!empty($res)){
-            $output .= 'OK';
-        }
-        else{
-            $output .= 'Fail';
-        }
+        $output .=  (!empty($res))?'OK':'Fail';
         $output .=  "\n";
     }
     else{
         $output .=  "\n$i) ============================\n";
-        $output .= $map_link_name;
+        $output .= $tmplvar['name'];
         $output .=  json_encode($map_link);
     }
 
     $i++;
-//    break;
 }
 
 ?>
@@ -133,14 +130,14 @@ foreach($media_sources_elements as $media_source_element){
 
     <div class="site-wrapper-inner">
 
-        <div class="cover-container margin-top">
+        <div class="cover-container">
 
             <div class="masthead clearfix">
                 <div class="inner">
-                    <h3 class="masthead-brand">Привязка TV к Источникам файлов</h3>
+                    <h3 class="masthead-brand">TVs</h3>
                     <nav>
                         <ul class="nav masthead-nav">
-                            <li><a href="../../../../">&lt; Back</a></li>
+                            <li><a href="../../../">&lt; Back</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -149,15 +146,6 @@ foreach($media_sources_elements as $media_source_element){
             <div class="inner cover">
                 <div class="row">
                     <div class="col-sm-6">
-                        <h1 class="cover-heading">Настройки</h1>
-                        <p>Следующим шагом необходиомо в админке сайта акцептора создать новый Источник файлов (Media Source) и прописать пути к картинкам сайта Донора</p>
-                        <form action="" class="form-inline" method="post">
-                            <div class="form-group">
-                                <label for="id">ID нового источника файлов</label>
-                                <input type="text" name="id" placeholder="ID" class="form-control">
-                                <input type="submit" value="Выполнитиь" class="form-control">
-                            </div>
-                        </form>
                     </div>
                     <div class="col-sm-6">
                         <?php
@@ -168,7 +156,7 @@ foreach($media_sources_elements as $media_source_element){
 
                         if($status='OK')
                         {
-                            print '<p><a href="../../../../" class="btn btn-primary">&lt; Вернуться назад</a></p>';
+                            print '<p><a href="values" class="btn btn-primary">Следующий шаг &gt;</a></p>';
                         }
                         ?>
                     </div>
