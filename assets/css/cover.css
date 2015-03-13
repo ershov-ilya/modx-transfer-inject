@@ -49,8 +49,9 @@ body {
   vertical-align: top;
 }
 .cover-container {
-  margin-right: auto;
-  margin-left: auto;
+    margin-top: 100px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 /* Padding for spacing */
@@ -165,4 +166,4 @@ body {
 
 .margin-bottom {margin-bottom:100px;}
 .margin-top {margin-top:100px;}
-pre{margin: 100px 0;}
+pre{margin: 0 0 100px;}

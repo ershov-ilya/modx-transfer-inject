@@ -36,10 +36,10 @@
 
             <div class="masthead clearfix">
                 <div class="inner">
-                    <h3 class="masthead-brand">TVs</h3>
+                    <h3 class="masthead-brand"><?=$tablename?></h3>
                     <nav>
                         <ul class="nav masthead-nav">
-                            <li><a href="../../../">&lt; Back</a></li>
+                            <li><a href="<?=API_BASE_URL?>">&lt; Home</a></li>
                         </ul>
                     </nav>
                 </div>
