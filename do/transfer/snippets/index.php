@@ -52,12 +52,28 @@ foreach($snippets as $snippet){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
     $output.= "\n$i) $entity $snippet[$name_field]:\t";
+
     if($transfer->is_exist($entity, $snippet['id'] ))  {$i++; $output.= "Done before\n"; continue;} // Предотвратить дубликаты
-//    if($transfer->is_exist($entity, $snippet[$name_field] ))  {$i++; $output.= "Done before\n"; continue;} // Предотвратить дубликаты
 
     $map_link=array( $entity=>$entity, 'name'=>$snippet[$name_field], 'donor_id' => $snippet['id']);
 
     unset($snippet['id']);
+
+    // Проверка на конфликт имён
+    // ВНИМАНИЕ: в случае конфликта имён TV переменных, новая TV переменная добавляться не будет
+    // Все значения будут привязаны к уже существующей TV переменной
+    // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
+    $name_conflict=false;
+    $conflict = $sbs->getOne($tablename, $snippet[$name_field], 'id,name', $name_field);
+    if(!empty($conflict)){
+        $name_conflict=true;
+        $newID=$conflict['id'];
+        if(DEBUG)
+        {
+            $output .= "\tNAME CONFLICT\n";
+            continue;
+        }
+    }
 
     $newID='';
     // Вносим в новый сайт
