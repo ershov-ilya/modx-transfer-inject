@@ -13,7 +13,7 @@ header('Content-Type: text/html; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', false);
+define('WRITE', true);
 
 require_once('../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
