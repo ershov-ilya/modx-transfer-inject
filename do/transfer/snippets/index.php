@@ -78,8 +78,12 @@ foreach($snippets as $snippet){
     $newID='';
     // Вносим в новый сайт
     if(WRITE) {
-        $newID=$sbs->putOne($tablename, $snippet);
-        print "$tablename insert:".$newID."\n";
+        try {
+            $newID=$sbs->putOne($tablename, $snippet);
+            print "$tablename insert:".$newID."\n";
+        } catch (Exception $e) {
+            $output .= 'Выброшено исключение: '.$e->getMessage()."\n";
+        }
     }
     $map_link['aceptor_id']=$newID;
 

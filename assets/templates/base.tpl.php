@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../../favicon.ico">
 
-    <title><?=$settings['project_name']?></title>
+    <title><?=$entity?> injection</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
