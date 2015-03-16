@@ -46,9 +46,9 @@ Allows to inject a MODX subsite into existing mother MODX website.
 
   1. Заполните **core.config.sample.php** файл и переименуйте его в **core.config.php**
 
-  2. Заполните **donor.config.sample.php** файл и переименуйте его в **donor.config.php**
+  2. Заполните **donor.config.sample.php** файл и переименуйте его в **donor.config.php**
 
-  3. Заполните **acceptor.config.sample.php** файл и переименуйте его в **acceptor.config.php**
+  3. Заполните **acceptor.config.sample.php** файл и переименуйте его в **acceptor.config.php**
 
 4. Импортируйте /dumps/import_map.sql в БД сайта Приёмника
 
