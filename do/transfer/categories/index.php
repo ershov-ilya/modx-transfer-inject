@@ -5,15 +5,15 @@
  * GitHub:   https://github.com/ershov-ilya/
  * About me: http://about.me/ershov.ilya (EN)
  * Website:  http://ershov.pw/ (RU)
- * Date: 10.03.2015
- * Time: 16:08
+ * Date: 16.03.2015
+ * Time: 14:31
  */
 
 header('Content-Type: text/html; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', true);
+define('WRITE', false);
 
 require_once('../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -28,9 +28,9 @@ $transfer = new Transfer($sbs);
 $base = new Database(API_CONFIG_PATH.'/donor.pdo.config.php');
 
 // Script config
-$tablename='modx_site_snippets';
-$name_field='name';
-$entity='snippet';
+$tablename='modx_categories';
+$name_field='category';
+$entity='category';
 
 // Init
 $output='';
@@ -39,7 +39,7 @@ $response['content']='';
 $response['buttons']='';
 $response['json']=array();
 
-$snippets=$base->getTable($tablename);
+$categories=$base->getTable($tablename);
 
 //print $transfer->ptr('template', 3);
 
@@ -48,24 +48,23 @@ $i=0;
 $start=$stop=0;
 $stop=5000;
 
-foreach($snippets as $snippet){
+foreach($categories as $category){
     if($i<$start) {$i++; continue;}
     if($i>$stop) break;
-    $output.= "\n$i) $entity $snippet[$name_field]:\t";
+    $output.= "\n$i) $entity $category[$name_field]:\t";
 
-    if($transfer->is_exist($entity, $snippet['id'] ))  {$i++; $output.= "Done before\n"; continue;} // Предотвратить дубликаты
+    if($transfer->is_exist($entity, $category['id'] ))  {$i++; $output.= "Done before\n"; continue;} // Предотвратить дубликаты
 
-    $map_link=array( 'entity'=>$entity, 'name'=>$snippet[$name_field], 'donor_id' => $snippet['id']);
+    $map_link=array( 'entity'=>$entity, 'name'=>$category[$name_field], 'donor_id' => $category['id']);
 
-    unset($snippet['id']);
+    unset($category['id']);
 
     // Проверка на конфликт имён
     // ВНИМАНИЕ: в случае конфликта имён TV переменных, новая TV переменная добавляться не будет
     // Все значения будут привязаны к уже существующей TV переменной
     // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
     $name_conflict=false;
-
-    $conflict = $sbs->getOne($tablename, $snippet[$name_field], "id,$name_field", $name_field);
+    $conflict = $sbs->getOne($tablename, $category[$name_field], "id,$name_field", $name_field);
     if(!empty($conflict)){
         $name_conflict=true;
         $newID=$conflict['id'];
@@ -78,9 +77,10 @@ foreach($snippets as $snippet){
 
     $newID='';
     // Вносим в новый сайт
+
     if(WRITE) {
         try {
-            $newID=$sbs->putOne($tablename, $snippet);
+            $newID=$sbs->putOne($tablename, $category);
             $output .= "$tablename insert:".$newID."\n";
         } catch (Exception $e) {
             $output .= 'Выброшено исключение: '.$e->getMessage()."\n";
@@ -104,10 +104,10 @@ foreach($snippets as $snippet){
 //    break;
 }
 
-    if($response['json']['status']=='OK')
-    {
-        $response['buttons'].= '<p><a href="values" class="btn btn-primary">Следующий шаг &gt;</a></p>';
-    }
+if($response['json']['status']=='OK')
+{
+    $response['buttons'].= '<p><a href="values" class="btn btn-primary">Следующий шаг &gt;</a></p>';
+}
 
 // Вывод шаблона
 if(!empty($response['json'])) $response['json']=json_encode($response['json']);

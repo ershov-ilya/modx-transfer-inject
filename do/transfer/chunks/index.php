@@ -64,7 +64,7 @@ foreach($chunks as $chunk){
     // Все значения будут привязаны к уже существующей TV переменной
     // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
     $name_conflict=false;
-    $conflict = $sbs->getOne($tablename, $chunk[$name_field], 'id,name', $name_field);
+    $conflict = $sbs->getOne($tablename, $chunk[$name_field], "id,$name_field", $name_field);
     if(!empty($conflict)){
         $name_conflict=true;
         $newID=$conflict['id'];
