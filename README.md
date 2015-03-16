@@ -44,22 +44,21 @@ Allows to inject a MODX subsite into existing mother MODX website.
 
 3. Затем нужно заполнить конфигурационные файлы:
 
-   1. Заполните **core.config.sample.php** файл и переименуйте его в **core.config.php**
+  1. Заполните **core.config.sample.php** файл и переименуйте его в **core.config.php**
 
-   2. Заполните **donor.config.sample.php** файл и переименуйте его в **donor.config.php**
+  2. Заполните **donor.config.sample.php** файл и переименуйте его в **donor.config.php**
 
-   3. Заполните **acceptor.config.sample.php** файл и переименуйте его в **acceptor.config.php**
-
+  3. Заполните **acceptor.config.sample.php** файл и переименуйте его в **acceptor.config.php**
 
 4. Импортируйте /dumps/import_map.sql в БД сайта Приёмника
 
 5. Вручную вставить первую запись в таблицу "import_map", где:
 
-  * ID = 1 (автоинкремент)
+  * ID = 1 (автоинкремент)
 
-  * donor_id = 0 (корень старого сайта)
+  * donor_id = 0 (корень старого сайта)
 
-  * aceptor_id = Здесь впишите идентификатор ресурса дерева документов, куда вы хотите прицепить содержание веб-сайта Донора (любой ресурс сайта Приёмника)
+  * aceptor_id = Здесь впишите идентификатор ресурса дерева документов, куда вы хотите прицепить содержание веб-сайта Донора (любой ресурс сайта Приёмника)
 
   * entity = resource
 
