@@ -14,7 +14,14 @@ Allows to inject a MODX subsite into existing mother MODX website.
 
 4. Import /dumps/import_map.sql into DB of acceptor site
 
-5. And then refer to /index.html for next steps
+5. Manually insert first entry to the table "import_map", where:
+  * id = 1 (autoincrement)
+  * donor_id = 0 (Root of old website)
+  * aceptor_id = Here place ID of resource tree element where you want to inject donor website content (any resource of acceptor site)
+  * entity = resource
+  * name = ROOT
+
+6. And then refer to /index.html for next steps
 
 По-русски
 ======
