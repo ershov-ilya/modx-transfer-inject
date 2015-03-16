@@ -1,5 +1,5 @@
 MODX Revolution website merging php-script
-======
+------
 
 Allows to inject a MODX subsite into existing mother MODX website.
 
