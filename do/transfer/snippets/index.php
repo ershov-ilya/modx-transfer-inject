@@ -13,7 +13,7 @@ header('Content-Type: text/html; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', false);
+define('WRITE', true);
 
 require_once('../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -55,7 +55,7 @@ foreach($snippets as $snippet){
 
     if($transfer->is_exist($entity, $snippet['id'] ))  {$i++; $output.= "Done before\n"; continue;} // Предотвратить дубликаты
 
-    $map_link=array( $entity=>$entity, 'name'=>$snippet[$name_field], 'donor_id' => $snippet['id']);
+    $map_link=array( 'entity'=>$entity, 'name'=>$snippet[$name_field], 'donor_id' => $snippet['id']);
 
     unset($snippet['id']);
 
@@ -64,6 +64,7 @@ foreach($snippets as $snippet){
     // Все значения будут привязаны к уже существующей TV переменной
     // В настоящий момент не видится возможным, корректная подмена имени TVшки в коде сайта
     $name_conflict=false;
+
     $conflict = $sbs->getOne($tablename, $snippet[$name_field], 'id,name', $name_field);
     if(!empty($conflict)){
         $name_conflict=true;
@@ -71,7 +72,7 @@ foreach($snippets as $snippet){
         if(DEBUG)
         {
             $output .= "\tNAME CONFLICT\n";
-            continue;
+            $i++; continue;
         }
     }
 
@@ -80,7 +81,7 @@ foreach($snippets as $snippet){
     if(WRITE) {
         try {
             $newID=$sbs->putOne($tablename, $snippet);
-            print "$tablename insert:".$newID."\n";
+            $output .= "$tablename insert:".$newID."\n";
         } catch (Exception $e) {
             $output .= 'Выброшено исключение: '.$e->getMessage()."\n";
         }

@@ -13,7 +13,7 @@ header('Content-Type: text/html; charset=utf-8');
 error_reporting(E_ERROR | E_WARNING);
 ini_set("display_errors", 1);
 define('DEBUG', true);
-define('WRITE', false);
+define('WRITE', true);
 
 require_once('../../../core/config/core.config.php');
 require_once(API_CORE_PATH.'/class/database/database.class.php');
@@ -55,7 +55,7 @@ foreach($chunks as $chunk){
 
     if($transfer->is_exist($entity, $chunk['id'] ))  {$i++; $output.= "Done before\n"; continue;} // Предотвратить дубликаты
 
-    $map_link=array( $entity=>$entity, 'name'=>$chunk[$name_field], 'donor_id' => $chunk['id']);
+    $map_link=array( 'entity'=>$entity, 'name'=>$chunk[$name_field], 'donor_id' => $chunk['id']);
 
     unset($chunk['id']);
 
@@ -71,7 +71,7 @@ foreach($chunks as $chunk){
         if(DEBUG)
         {
             $output .= "\tNAME CONFLICT\n";
-            continue;
+            $i++; continue;
         }
     }
 
@@ -81,7 +81,7 @@ foreach($chunks as $chunk){
     if(WRITE) {
         try {
             $newID=$sbs->putOne($tablename, $chunk);
-            print "$tablename insert:".$newID."\n";
+            $output .= "$tablename insert:".$newID."\n";
         } catch (Exception $e) {
             $output .= 'Выброшено исключение: '.$e->getMessage()."\n";
         }
